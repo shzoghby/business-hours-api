@@ -1,4 +1,4 @@
-# TWILIO Business Hours API
+# Business Hours API
 
 This API checks if current time is within business hours or not.
 
