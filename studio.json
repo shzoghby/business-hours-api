@@ -1,0 +1,148 @@
+{
+    "description": "Business Hours Checker - Http",
+    "states": [
+      {
+        "name": "Trigger",
+        "type": "trigger",
+        "transitions": [
+          {
+            "next": "http_business_hours",
+            "event": "incomingMessage"
+          },
+          {
+            "event": "incomingCall"
+          },
+          {
+            "next": "http_business_hours",
+            "event": "incomingRequest"
+          },
+          {
+            "event": "incomingParent"
+          }
+        ],
+        "properties": {
+          "offset": {
+            "x": 0,
+            "y": 0
+          }
+        }
+      },
+      {
+        "name": "http_business_hours",
+        "type": "make-http-request",
+        "transitions": [
+          {
+            "next": "split_isopen",
+            "event": "success"
+          },
+          {
+            "event": "failed"
+          }
+        ],
+        "properties": {
+          "offset": {
+            "x": 120,
+            "y": 410
+          },
+          "method": "POST",
+          "content_type": "application/json;charset=utf-8",
+          "body": "{\"country\":\"Australia\",\"city\":\"Melbourne\", \"openHour\": 9,\"closeHour\": 17}",
+          "url": "https://selzoghby.au.ngrok.io/api/business-hours"
+        }
+      },
+      {
+        "name": "send_message_close",
+        "type": "send-message",
+        "transitions": [
+          {
+            "event": "sent"
+          },
+          {
+            "event": "failed"
+          }
+        ],
+        "properties": {
+          "offset": {
+            "x": 1100,
+            "y": 1100
+          },
+          "service": "{{trigger.message.InstanceSid}}",
+          "channel": "{{trigger.message.ChannelSid}}",
+          "from": "{{flow.channel.address}}",
+          "to": "{{contact.channel.address}}",
+          "body": "Ahoy! Welcome to 'Business Hours Checker' HTPP. We are currently closed.\n\nOur openning hours today is {{widgets.http_business_hours.parsed.response.openHour}}:00 - {{widgets.http_business_hours.parsed.response.closeHour}}:00\n(Time Zone: {{widgets.http_business_hours.parsed.response.timezone}})"
+        }
+      },
+      {
+        "name": "split_isopen",
+        "type": "split-based-on",
+        "transitions": [
+          {
+            "event": "noMatch"
+          },
+          {
+            "next": "send_message_open",
+            "event": "match",
+            "conditions": [
+              {
+                "friendly_name": "If value equal_to true",
+                "arguments": [
+                  "{{widgets.http_business_hours.parsed.response.isOpen}}"
+                ],
+                "type": "equal_to",
+                "value": "true"
+              }
+            ]
+          },
+          {
+            "next": "send_message_close",
+            "event": "match",
+            "conditions": [
+              {
+                "friendly_name": "If value equal_to false",
+                "arguments": [
+                  "{{widgets.http_business_hours.parsed.response.isOpen}}"
+                ],
+                "type": "equal_to",
+                "value": "false"
+              }
+            ]
+          }
+        ],
+        "properties": {
+          "input": "{{widgets.http_business_hours.parsed.response.isOpen}}",
+          "offset": {
+            "x": 240,
+            "y": 680
+          }
+        }
+      },
+      {
+        "name": "send_message_open",
+        "type": "send-message",
+        "transitions": [
+          {
+            "event": "sent"
+          },
+          {
+            "event": "failed"
+          }
+        ],
+        "properties": {
+          "offset": {
+            "x": 350,
+            "y": 1090
+          },
+          "service": "{{trigger.message.InstanceSid}}",
+          "channel": "{{trigger.message.ChannelSid}}",
+          "from": "{{flow.channel.address}}",
+          "to": "{{contact.channel.address}}",
+          "body": "Ahoy! Welcome to 'Business Hours Checker' HTPP. We are currently open.\n\nOur openning hours today is {{widgets.http_business_hours.parsed.response.openHour}}:00 - {{widgets.http_business_hours.parsed.response.closeHour}}:00\n(Time Zone: {{widgets.http_business_hours.parsed.response.timezone}})"
+        }
+      }
+    ],
+    "initial_state": "Trigger",
+    "flags": {
+      "allow_concurrent_calls": true
+    }
+  }
