@@ -16,12 +16,12 @@ This Function expects the following environment variables set:
 
 ## Parameters
 
-| Parameter            | Meaning                           | Required | Default |
-| :------------------ | :-------------------------------- | :------- | :------- |
-| `country` | A country to use for time zone checking | No      | Australia      |
-| `city` | A city to use for time zone checking | No      | Sydney      |
-| `openHour` | A number to use for openning hour checking | No      | 0      |
-| `closeHour` | A number to use for clossing hour checking | No      | 12      |
+| Parameter            | Meaning                           | Required |
+| :------------------ | :-------------------------------- | :------- |
+| `country` | A country to use for time zone checking | No      |
+| `city` | A city to use for time zone checking | No      |
+| `openHour` | A number to use for openning hour checking | No      |
+| `closeHour` | A number to use for clossing hour checking | No      |
 
 ## Start the application locally
 
@@ -37,7 +37,7 @@ npm ci
 npm run dev
 ```
 
-5. Copy the api url https://localhost:3000/api/business-hours to use in your app
+3. Copy the api url https://localhost:3000/api/business-hours (or its ngrok) to use in your app
 
 ---
 
